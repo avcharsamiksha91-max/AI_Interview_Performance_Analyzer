@@ -1,0 +1,33 @@
+===== AI Interview Voice Analysis =====
+
+Candidate : Samiksha
+
+Transcript
+ Hello, my name is Samiksha Avchar. I am a diploma student at Mahavir Polytechnic, Nashi. My branch is Computer Engineering. I am a final year student and I am an intern at Soft Crowd Technologies in domain data science with Python.
+
+AI Feedback
+Overall Score: 60/100
+
+Communication: 6/10
+Confidence: 5/10
+Fluency: 7/10
+Grammar: 8/10
+
+Strengths:
+- Clearly mentions their name, institution, and branch of study
+- Provides relevant information about their current internship
+- Shows some level of fluency in their speech
+
+Weaknesses:
+- Lacks confidence and enthusiasm in their tone
+- Fails to provide any personal accomplishments or skills beyond their current internship
+
+Suggestions:
+- Practice speaking with more confidence and conviction to make a stronger impression
+- Consider highlighting any relevant skills, projects, or achievements to demonstrate their capabilities beyond their internship experience
+
+Overall Score : 60/100
+Speaking Speed : 80%
+Confidence : 65%
+Voice Clarity : 90%
+Fluency : 57%
