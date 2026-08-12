@@ -1,6 +1,6 @@
 streamlit
 streamlit-webrtc==0.76.2
-opencv-python
+opencv-python==4.11.0.86
 mediapipe
 google-generativeai
 groq
