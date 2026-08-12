@@ -3,6 +3,7 @@ streamlit-webrtc==0.76.2
 opencv-python
 mediapipe
 google-generativeai
+groq
 numpy
 pandas
 plotly
