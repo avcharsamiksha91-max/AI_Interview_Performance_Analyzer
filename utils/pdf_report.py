@@ -10,51 +10,74 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.enums import TA_CENTER
 import os
+from datetime import datetime
 
 
-# =====================================================
+# ============================================================
 # FINAL REPORT FUNCTION
-# =====================================================
+# ============================================================
 
 def generate_final_report(
     filename,
     candidate_name,
     final_score,
 
+    # Candidate Information
+    candidate_email="",
+    interview_date="",
+
     # Voice
-    voice_score,
-    confidence,
-    fluency,
-    voice_clarity,
-    speaking_speed,
-    wpm,
-    filler_words,
+    voice_score=0,
+    confidence=0,
+    fluency=0,
+    voice_clarity=0,
+    speaking_speed=0,
+    wpm=0,
+    filler_words=0,
 
     # Video
-    video_score,
-    face_presence,
-    face_position,
-    eye_contact,
-    expression,
+    video_score=0,
+    face_presence=0,
+    face_position=0,
+    eye_contact=0,
+    expression=0,
 
     # Text
-    transcript,
-    ai_feedback,
-    recommendations,
+    transcript="",
+    ai_feedback="",
+    recommendations=None,
 ):
 
-    # =================================================
+    # ============================================================
+    # DEFAULT VALUES
+    # ============================================================
+
+    if recommendations is None:
+        recommendations = []
+
+    # If interview date is not provided,
+    # use today's date as fallback.
+    if not interview_date:
+        interview_date = datetime.now().strftime("%d %B %Y")
+
+    if not candidate_email:
+        candidate_email = "Not provided"
+
+    if not candidate_name:
+        candidate_name = "Not provided"
+
+    # ============================================================
     # CREATE REPORT FOLDER
-    # =================================================
+    # ============================================================
 
     folder = os.path.dirname(filename)
 
     if folder:
         os.makedirs(folder, exist_ok=True)
 
-    # =================================================
+    # ============================================================
     # CREATE PDF
-    # =================================================
+    # ============================================================
 
     pdf = SimpleDocTemplate(
         filename,
@@ -69,9 +92,9 @@ def generate_final_report(
 
     story = []
 
-    # =================================================
+    # ============================================================
     # TITLE
-    # =================================================
+    # ============================================================
 
     title_style = styles["Title"]
     title_style.alignment = TA_CENTER
@@ -85,26 +108,86 @@ def generate_final_report(
 
     story.append(Spacer(1, 20))
 
-    # =================================================
-    # CANDIDATE
-    # =================================================
+    # ============================================================
+    # CANDIDATE INFORMATION
+    # ============================================================
 
     story.append(
         Paragraph(
-            f"<b>Candidate:</b> {candidate_name}",
-            styles["Normal"]
+            "Candidate Information",
+            styles["Heading2"]
         )
     )
 
-    story.append(Spacer(1, 10))
+    candidate_data = [
+        ["Candidate Name", str(candidate_name)],
+        ["Email", str(candidate_email)],
+        ["Interview Date", str(interview_date)],
+    ]
 
-    # =================================================
+    candidate_table = Table(
+        candidate_data,
+        colWidths=[150, 250]
+    )
+
+    candidate_table.setStyle(
+        TableStyle([
+            (
+                "BACKGROUND",
+                (0, 0),
+                (0, -1),
+                colors.lightgrey
+            ),
+
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.5,
+                colors.grey
+            ),
+
+            (
+                "FONTNAME",
+                (0, 0),
+                (0, -1),
+                "Helvetica-Bold"
+            ),
+
+            (
+                "VALIGN",
+                (0, 0),
+                (-1, -1),
+                "MIDDLE"
+            ),
+
+            (
+                "LEFTPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+
+            (
+                "RIGHTPADDING",
+                (0, 0),
+                (-1, -1),
+                8
+            ),
+        ])
+    )
+
+    story.append(candidate_table)
+
+    story.append(Spacer(1, 20))
+
+    # ============================================================
     # FINAL SCORE
-    # =================================================
+    # ============================================================
 
     story.append(
         Paragraph(
-            "<b>FINAL INTERVIEW SCORE</b>",
+            "FINAL INTERVIEW SCORE",
             styles["Heading2"]
         )
     )
@@ -118,9 +201,9 @@ def generate_final_report(
 
     story.append(Spacer(1, 20))
 
-    # =================================================
+    # ============================================================
     # VOICE ANALYSIS
-    # =================================================
+    # ============================================================
 
     story.append(
         Paragraph(
@@ -189,9 +272,9 @@ def generate_final_report(
 
     story.append(Spacer(1, 20))
 
-    # =================================================
+    # ============================================================
     # VIDEO ANALYSIS
-    # =================================================
+    # ============================================================
 
     story.append(
         Paragraph(
@@ -256,9 +339,9 @@ def generate_final_report(
 
     story.append(Spacer(1, 20))
 
-    # =================================================
+    # ============================================================
     # TRANSCRIPT
-    # =================================================
+    # ============================================================
 
     story.append(
         Paragraph(
@@ -275,6 +358,9 @@ def generate_final_report(
         .replace("\n", "<br/>")
     )
 
+    if not safe_transcript:
+        safe_transcript = "No transcript available."
+
     story.append(
         Paragraph(
             safe_transcript,
@@ -284,9 +370,9 @@ def generate_final_report(
 
     story.append(Spacer(1, 20))
 
-    # =================================================
+    # ============================================================
     # AI FEEDBACK
-    # =================================================
+    # ============================================================
 
     story.append(
         Paragraph(
@@ -303,6 +389,9 @@ def generate_final_report(
         .replace("\n", "<br/>")
     )
 
+    if not safe_feedback:
+        safe_feedback = "No AI feedback available."
+
     story.append(
         Paragraph(
             safe_feedback,
@@ -312,9 +401,9 @@ def generate_final_report(
 
     story.append(Spacer(1, 20))
 
-    # =================================================
+    # ============================================================
     # RECOMMENDATIONS
-    # =================================================
+    # ============================================================
 
     story.append(
         Paragraph(
@@ -323,27 +412,38 @@ def generate_final_report(
         )
     )
 
-    for item in recommendations:
+    if recommendations:
 
-        safe_item = (
-            str(item)
-            .replace("&", "&amp;")
-            .replace("<", "&lt;")
-            .replace(">", "&gt;")
-        )
+        for item in recommendations:
+
+            safe_item = (
+                str(item)
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+            )
+
+            story.append(
+                Paragraph(
+                    f"• {safe_item}",
+                    styles["Normal"]
+                )
+            )
+
+            story.append(Spacer(1, 5))
+
+    else:
 
         story.append(
             Paragraph(
-                f"• {safe_item}",
+                "No recommendations available.",
                 styles["Normal"]
             )
         )
 
-        story.append(Spacer(1, 5))
-
-    # =================================================
+    # ============================================================
     # FOOTER
-    # =================================================
+    # ============================================================
 
     story.append(Spacer(1, 30))
 
@@ -354,18 +454,18 @@ def generate_final_report(
         )
     )
 
-    # =================================================
+    # ============================================================
     # BUILD PDF
-    # =================================================
+    # ============================================================
 
     pdf.build(story)
 
 
-# =====================================================
+# ============================================================
 # OLD REPORT FUNCTION
-# =====================================================
+# ============================================================
 # This keeps 5_voice_analysis.py working.
-# =====================================================
+# ============================================================
 
 def generate_report(
     filename,
@@ -380,13 +480,12 @@ def generate_report(
     score_value = str(score)
 
     if "/" in score_value:
-
         score_value = score_value.split("/")[0]
 
     try:
         score_value = int(score_value)
 
-    except:
+    except Exception:
         score_value = 0
 
     generate_final_report(
@@ -396,6 +495,10 @@ def generate_report(
         candidate_name=candidate_name,
 
         final_score=score_value,
+
+        # Candidate Information
+        candidate_email="",
+        interview_date="",
 
         # Voice
         voice_score=score_value,

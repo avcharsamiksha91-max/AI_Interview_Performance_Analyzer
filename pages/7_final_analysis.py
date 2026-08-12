@@ -30,13 +30,82 @@ st.write(
 
 
 # ============================================================
+# CANDIDATE INFORMATION
+# ============================================================
+
+candidate_name = st.session_state.get(
+    "candidate_name",
+    ""
+)
+
+candidate_email = st.session_state.get(
+    "candidate_email",
+    ""
+)
+
+interview_date = st.session_state.get(
+    "interview_date",
+    ""
+)
+
+
+# ============================================================
+# CANDIDATE INFORMATION DISPLAY
+# ============================================================
+
+st.markdown("---")
+
+st.subheader(
+    "👤 Candidate Information"
+)
+
+info1, info2, info3 = st.columns(3)
+
+
+with info1:
+
+    st.write(
+        "👤 **Candidate Name**"
+    )
+
+    st.write(
+        candidate_name
+        if candidate_name
+        else "Not Provided"
+    )
+
+
+with info2:
+
+    st.write(
+        "📧 **Email**"
+    )
+
+    st.write(
+        candidate_email
+        if candidate_email
+        else "Not Provided"
+    )
+
+
+with info3:
+
+    st.write(
+        "📅 **Interview Date**"
+    )
+
+    st.write(
+        interview_date
+        if interview_date
+        else "Not Provided"
+    )
+
+
+# ============================================================
 # HELPER
 # ============================================================
 
-def get_score(
-    key,
-    default=0
-):
+def get_score(key, default=0):
 
     value = st.session_state.get(
         key,
@@ -255,7 +324,10 @@ else:
 
 
 st.progress(
-    min(max(final_score, 0), 100)
+    min(
+        max(final_score, 0),
+        100
+    )
 )
 
 st.caption(
@@ -374,7 +446,10 @@ with c1:
     )
 
     st.progress(
-        min(max(voice_speed, 0), 100)
+        min(
+            max(voice_speed, 0),
+            100
+        )
     )
 
     st.caption(
@@ -389,7 +464,10 @@ with c2:
     )
 
     st.progress(
-        min(max(voice_fluency, 0), 100)
+        min(
+            max(voice_fluency, 0),
+            100
+        )
     )
 
     st.caption(
@@ -415,7 +493,10 @@ with c1:
     )
 
     st.progress(
-        min(max(face_presence, 0), 100)
+        min(
+            max(face_presence, 0),
+            100
+        )
     )
 
     st.caption(
@@ -430,7 +511,10 @@ with c2:
     )
 
     st.progress(
-        min(max(face_position, 0), 100)
+        min(
+            max(face_position, 0),
+            100
+        )
     )
 
     st.caption(
@@ -443,11 +527,16 @@ with c2:
 # ============================================================
 
 st.markdown("---")
-st.subheader("📈 Voice Statistics")
+
+st.subheader(
+    "📈 Voice Statistics"
+)
 
 c1, c2, c3 = st.columns(3)
 
+
 with c1:
+
     st.metric(
         "📝 Words",
         st.session_state.get(
@@ -456,7 +545,9 @@ with c1:
         )
     )
 
+
 with c2:
+
     st.metric(
         "⚡ WPM",
         st.session_state.get(
@@ -465,7 +556,9 @@ with c2:
         )
     )
 
+
 with c3:
+
     st.metric(
         "🔁 Filler Words",
         st.session_state.get(
@@ -513,14 +606,12 @@ if voice_available:
             "Improve confidence while speaking."
         )
 
-
     if voice_fluency < 70:
 
         recommendations.append(
             "Practice fluency and reduce "
             "unnecessary pauses."
         )
-
 
     if voice_filler > 5:
 
@@ -539,7 +630,6 @@ if video_available:
             "with the camera."
         )
 
-
     if face_presence < 70:
 
         recommendations.append(
@@ -547,14 +637,12 @@ if video_available:
             "in the camera."
         )
 
-
     if face_position < 70:
 
         recommendations.append(
             "Keep your face centered "
             "in the camera frame."
         )
-
 
     if expression < 70:
 
@@ -600,7 +688,7 @@ st.subheader(
 
 st.write(
     "Generate a complete PDF containing "
-    "Voice + Video analysis."
+    "Candidate Information + Voice + Video analysis."
 )
 
 
@@ -618,14 +706,30 @@ if st.button(
         "reports/final_interview_report.pdf"
     )
 
-
     try:
 
         generate_final_report(
 
             filename=pdf_path,
 
-            candidate_name="Samiksha",
+            # Candidate Information
+            candidate_name=(
+                candidate_name
+                if candidate_name
+                else "Not Provided"
+            ),
+
+            candidate_email=(
+                candidate_email
+                if candidate_email
+                else "Not Provided"
+            ),
+
+            interview_date=(
+                interview_date
+                if interview_date
+                else "Not Provided"
+            ),
 
             final_score=final_score,
 
@@ -651,11 +755,9 @@ if st.button(
             recommendations=recommendations,
         )
 
-
         st.success(
             "✅ Final PDF Report Generated Successfully!"
         )
-
 
         with open(
             pdf_path,
@@ -664,7 +766,6 @@ if st.button(
 
             pdf_data = pdf_file.read()
 
-
         st.download_button(
             label="⬇️ Download Final Interview Report",
             data=pdf_data,
@@ -672,7 +773,6 @@ if st.button(
             mime="application/pdf",
             use_container_width=True,
         )
-
 
     except Exception as e:
 
@@ -701,7 +801,6 @@ if st.button(
         "reports/final_analysis.txt"
     )
 
-
     try:
 
         with open(
@@ -714,15 +813,29 @@ if st.button(
                 "===== AI INTERVIEW FINAL ANALYSIS =====\n\n"
             )
 
+            # Candidate Information
             file.write(
-                "Candidate: Samiksha\n\n"
+                f"Candidate Name: "
+                f"{candidate_name if candidate_name else 'Not Provided'}\n"
             )
 
+            file.write(
+                f"Email: "
+                f"{candidate_email if candidate_email else 'Not Provided'}\n"
+            )
+
+            file.write(
+                f"Interview Date: "
+                f"{interview_date if interview_date else 'Not Provided'}\n\n"
+            )
+
+            # Final Score
             file.write(
                 f"Final Score: "
                 f"{final_score}/100\n\n"
             )
 
+            # Voice
             file.write(
                 f"Voice Score: "
                 f"{voice_score}/100\n"
@@ -757,6 +870,7 @@ if st.button(
                 f"{voice_filler}\n\n"
             )
 
+            # Video
             file.write(
                 f"Video Score: "
                 f"{video_score}/100\n"
@@ -782,6 +896,7 @@ if st.button(
                 f"{expression}%\n\n"
             )
 
+            # Transcript
             file.write(
                 "===== TRANSCRIPT =====\n"
             )
@@ -790,6 +905,7 @@ if st.button(
                 transcript
             )
 
+            # AI Feedback
             file.write(
                 "\n\n===== AI FEEDBACK =====\n"
             )
@@ -798,6 +914,7 @@ if st.button(
                 voice_feedback
             )
 
+            # Recommendations
             file.write(
                 "\n\n===== RECOMMENDATIONS =====\n"
             )
@@ -808,11 +925,9 @@ if st.button(
                     f"- {item}\n"
                 )
 
-
         st.success(
             "✅ Final Analysis Saved Successfully!"
         )
-
 
     except Exception as e:
 

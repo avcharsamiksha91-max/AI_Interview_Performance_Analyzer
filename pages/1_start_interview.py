@@ -20,25 +20,37 @@ os.makedirs("audio", exist_ok=True)
 # ============================================================
 
 DEFAULTS = {
+    # Interview status
     "interview_started": False,
     "interview_completed": False,
 
+    # Candidate Information
+    "candidate_name": "",
+    "candidate_email": "",
+    "interview_date": "",
+    "candidate_info_required": False,
+
+    # Interview question data
     "current_question": "",
     "question_number": 0,
 
+    # Interview settings
     "interview_type": "General",
     "difficulty": "Medium",
     "total_questions": 5,
 
+    # Interview data
     "questions": [],
     "answers": [],
     "transcripts": [],
 
+    # Audio
     "audio_files": [],
 }
 
 
 for key, value in DEFAULTS.items():
+
     if key not in st.session_state:
         st.session_state[key] = value
 
@@ -66,6 +78,10 @@ st.subheader("⚙️ Interview Settings")
 col1, col2, col3 = st.columns(3)
 
 
+# ============================================================
+# INTERVIEW TYPE
+# ============================================================
+
 with col1:
 
     interview_type = st.selectbox(
@@ -89,6 +105,10 @@ with col1:
     )
 
 
+# ============================================================
+# DIFFICULTY
+# ============================================================
+
 with col2:
 
     difficulty = st.selectbox(
@@ -109,6 +129,10 @@ with col2:
         disabled=st.session_state["interview_started"],
     )
 
+
+# ============================================================
+# NUMBER OF QUESTIONS
+# ============================================================
 
 with col3:
 
@@ -153,23 +177,160 @@ if not st.session_state["interview_started"]:
     ):
 
         # ----------------------------------------------------
-        # SAVE SETTINGS
+        # SHOW CANDIDATE INFORMATION FORM
         # ----------------------------------------------------
 
-        st.session_state["interview_type"] = interview_type
-        st.session_state["difficulty"] = difficulty
-        st.session_state["total_questions"] = total_questions
+        st.session_state["candidate_info_required"] = True
+
+        st.rerun()
+
+
+# ============================================================
+# CANDIDATE INFORMATION
+# ============================================================
+
+if (
+    st.session_state["candidate_info_required"]
+    and not st.session_state["interview_started"]
+):
+
+    st.divider()
+
+    st.subheader("👤 Candidate Information")
+
+    st.write(
+        "Please enter your information before starting "
+        "the interview."
+    )
+
+    # --------------------------------------------------------
+    # CANDIDATE NAME
+    # --------------------------------------------------------
+
+    candidate_name = st.text_input(
+        "👤 Candidate Name",
+        value=st.session_state["candidate_name"],
+        placeholder="Enter your full name",
+        key="candidate_name_input",
+    )
+
+    # --------------------------------------------------------
+    # EMAIL
+    # --------------------------------------------------------
+
+    candidate_email = st.text_input(
+        "📧 Email",
+        value=st.session_state["candidate_email"],
+        placeholder="Enter your email address",
+        key="candidate_email_input",
+    )
+
+    # --------------------------------------------------------
+    # INTERVIEW DATE
+    # --------------------------------------------------------
+
+    interview_date = st.date_input(
+        "📅 Interview Date",
+        key="interview_date_input",
+    )
+
+    st.divider()
+
+    # --------------------------------------------------------
+    # CONTINUE TO INTERVIEW
+    # --------------------------------------------------------
+
+    if st.button(
+        "🚀 Continue to Interview",
+        use_container_width=True,
+        type="primary",
+    ):
+
+        # ----------------------------------------------------
+        # VALIDATE NAME
+        # ----------------------------------------------------
+
+        if not candidate_name.strip():
+
+            st.warning(
+                "⚠️ Please enter your name."
+            )
+
+            st.stop()
+
+        # ----------------------------------------------------
+        # VALIDATE EMAIL
+        # ----------------------------------------------------
+
+        if not candidate_email.strip():
+
+            st.warning(
+                "⚠️ Please enter your email address."
+            )
+
+            st.stop()
+
+        # ----------------------------------------------------
+        # BASIC EMAIL VALIDATION
+        # ----------------------------------------------------
+
+        if (
+            "@" not in candidate_email
+            or "." not in candidate_email.split("@")[-1]
+        ):
+
+            st.warning(
+                "⚠️ Please enter a valid email address."
+            )
+
+            st.stop()
+
+        # ----------------------------------------------------
+        # SAVE CANDIDATE INFORMATION
+        # ----------------------------------------------------
+
+        st.session_state["candidate_name"] = (
+            candidate_name.strip()
+        )
+
+        st.session_state["candidate_email"] = (
+            candidate_email.strip()
+        )
+
+        st.session_state["interview_date"] = (
+            str(interview_date)
+        )
+
+        # ----------------------------------------------------
+        # SAVE INTERVIEW SETTINGS
+        # ----------------------------------------------------
+
+        st.session_state["interview_type"] = (
+            interview_type
+        )
+
+        st.session_state["difficulty"] = (
+            difficulty
+        )
+
+        st.session_state["total_questions"] = (
+            total_questions
+        )
 
         # ----------------------------------------------------
         # RESET INTERVIEW DATA
         # ----------------------------------------------------
 
         st.session_state["questions"] = []
+
         st.session_state["answers"] = []
+
         st.session_state["transcripts"] = []
+
         st.session_state["audio_files"] = []
 
         st.session_state["question_number"] = 1
+
         st.session_state["interview_completed"] = False
 
         # ----------------------------------------------------
@@ -210,12 +371,14 @@ if not st.session_state["interview_started"]:
             st.stop()
 
         # ----------------------------------------------------
-        # SAVE QUESTION
+        # SAVE FIRST QUESTION
         # ----------------------------------------------------
 
         st.session_state["current_question"] = str(
             question
         )
+
+        st.session_state["candidate_info_required"] = False
 
         st.session_state["interview_started"] = True
 
@@ -360,6 +523,7 @@ if st.session_state["interview_started"]:
                     frames = []
 
         except Exception:
+
             frames = []
 
 
@@ -406,7 +570,9 @@ if st.session_state["interview_started"]:
                     "wb",
                 ) as wav:
 
-                    wav.setnchannels(channels)
+                    wav.setnchannels(
+                        channels
+                    )
 
                     wav.setsampwidth(2)
 
@@ -440,7 +606,7 @@ if st.session_state["interview_started"]:
                             audio_path
                         )
 
-                    except Exception as e:
+                    except Exception:
 
                         st.warning(
                             "⚠️ Speech-to-text failed. "
@@ -625,6 +791,39 @@ if st.session_state["interview_completed"]:
 
 
     # --------------------------------------------------------
+    # CANDIDATE INFORMATION
+    # --------------------------------------------------------
+
+    st.subheader("👤 Candidate Information")
+
+    info_col1, info_col2, info_col3 = st.columns(3)
+
+    with info_col1:
+
+        st.markdown("**👤 Candidate Name**")
+
+        st.write(
+            st.session_state["candidate_name"]
+        )
+
+    with info_col2:
+
+        st.markdown("**📧 Email**")
+
+        st.write(
+            st.session_state["candidate_email"]
+        )
+
+    with info_col3:
+
+        st.markdown("**📅 Interview Date**")
+
+        st.write(
+            st.session_state["interview_date"]
+        )
+
+
+    # --------------------------------------------------------
     # TOTAL QUESTIONS
     # --------------------------------------------------------
 
@@ -688,6 +887,22 @@ if st.button(
     use_container_width=True,
 ):
 
+    # --------------------------------------------------------
+    # RESET CANDIDATE INFORMATION
+    # --------------------------------------------------------
+
+    st.session_state["candidate_name"] = ""
+
+    st.session_state["candidate_email"] = ""
+
+    st.session_state["interview_date"] = ""
+
+    st.session_state["candidate_info_required"] = False
+
+    # --------------------------------------------------------
+    # RESET INTERVIEW
+    # --------------------------------------------------------
+
     st.session_state["interview_started"] = False
 
     st.session_state["interview_completed"] = False
@@ -721,14 +936,16 @@ st.write(
 2. Select difficulty.
 3. Select number of questions.
 4. Click **Start AI Interview**.
-5. Groq AI generates the first question.
-6. Start camera + microphone.
-7. Answer the question.
-8. Click **Finish Answer**.
-9. Speech is converted to text.
-10. Groq AI generates the next question.
-11. Complete the interview.
-12. Continue to Voice, Video and Final Analysis.
+5. Enter candidate name, email and interview date.
+6. Click **Continue to Interview**.
+7. Groq AI generates the first question.
+8. Start camera + microphone.
+9. Answer the question.
+10. Click **Finish Answer**.
+11. Speech is converted to text.
+12. Groq AI generates the next question.
+13. Complete the interview.
+14. Continue to Voice, Video and Final Analysis.
 """
 )
 
