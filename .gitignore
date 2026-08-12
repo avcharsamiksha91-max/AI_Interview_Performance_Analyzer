@@ -16,3 +16,6 @@ reports/*.txt
 *.webm
 
 .vscode/
+
+.venv/
+audio/*.wav
