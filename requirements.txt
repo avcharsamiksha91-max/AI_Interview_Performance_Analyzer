@@ -9,3 +9,4 @@ plotly
 reportlab
 Pillow
 sqlalchemy
+python-dotenv
